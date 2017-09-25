@@ -1,0 +1,17 @@
+{
+  "name": "search-champions",
+  "version": "1.0.0",
+  "description": "Manipulate the data, in real time",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Oleksandra Fedorova",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^2.5.7",
+    "express": "^4.15.5",
+    "fs": "0.0.1-security",
+    "nodemon": "^1.12.1"
+  }
+}
