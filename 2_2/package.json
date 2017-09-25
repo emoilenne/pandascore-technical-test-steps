@@ -1,0 +1,12 @@
+{
+  "name": "display-data",
+  "version": "1.0.0",
+  "description": "Display the data from json file",
+  "main": "server.js",
+  "scripts": {},
+  "author": "Oleksandra Fedorova",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.5"
+  }
+}
