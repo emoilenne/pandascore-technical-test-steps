@@ -4,12 +4,19 @@
     <title>Champions</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/styles.css">
+    <script type="text/javascript" src="/scripts/index.js"></script>
   </head>
   <body>
+
+    <h1>Champion filters</h1>
+
+    <input type="text" class="search_bar" id="inputField" onkeyup="search()" placeholder="Search Champions">
+
+
     <h1>Champion grid</h1>
 
-    <% for (var i = 0; i < data['champions'].length; i++) { %>
-      <% var name = data['champions'][i]['name']; %>
+    <% for (var i = 0; i < search_results.length; i++) { %>
+      <% var name = search_results[i]['name']; %>
       <div class="champion">
         <img src="img/<%= name %>Square.png">
         <center><%= name %></center>

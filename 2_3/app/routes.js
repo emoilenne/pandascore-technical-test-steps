@@ -6,11 +6,13 @@ module.exports = router;
 
 router.get('/', function(req, res) {
   var data = JSON.parse(require('fs').readFileSync('data.json', 'utf8'));
-  data['champions'].sort(function (a, b) {
+  var champions = data['champions']
+  champions.sort(function (a, b) {
     a = a['name'].toLowerCase();
     b = b['name'].toLowerCase();
     return (a < b) ? -1 : (a > b) ? 1 : 0;
   })
-  res.locals.data = data;
+  res.locals.champions = champions;
+  res.locals.search_results = champions;
   res.render('pages/index')
 });
