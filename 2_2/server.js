@@ -1,5 +1,6 @@
-var express = require('express');
-var expressLayouts = require('express-ejs-layouts');
+var express =         require('express');
+var expressLayouts =  require('express-ejs-layouts');
+
 var app = express();
 var port = 2020;
 

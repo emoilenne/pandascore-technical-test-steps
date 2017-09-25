@@ -8,9 +8,13 @@
   <body>
     <h1>Champion grid</h1>
 
-    <div class="actor col-xs-2">
-      Champion
-    </div>
+    <% for (var i = 0; i < data['champions'].length; i++) { %>
+      <% var name = data['champions'][i]['name']; %>
+      <div class="champion">
+        <img src="img/<%= name %>Square.png">
+        <center><%= name %></center>
+      </div>
+    <% } %>
 
   </body>
 </html>
