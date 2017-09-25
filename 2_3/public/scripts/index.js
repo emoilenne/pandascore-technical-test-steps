@@ -1,6 +1,6 @@
 function search() {
-  inputField = document.getElementById('inputField');
-  var query = inputField.value.trim().toLowerCase();
+  searchBar = document.getElementById('searchBar');
+  var query = searchBar.value.trim().toLowerCase();
   // search_results = []
   // for (var i = 0; i < champions.length; i++) {
   //   if (champions[i]['name'].indexOf(query) != -1) {
