@@ -17,3 +17,13 @@ body {
   padding-left: 5px;
   align-self: center;
 }
+
+.roles_bar {
+  height: 100px;
+}
+
+.roles_checkbox {
+  display: block;
+  float: left;
+  width: 150px;
+}
