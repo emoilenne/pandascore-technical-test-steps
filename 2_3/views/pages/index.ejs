@@ -40,20 +40,21 @@
         if (!query || name.toLowerCase().indexOf(query) != -1) {
           champions[champion_index].style.display = "";
         } else {
+          console.log(1);
           champions[champion_index].style.display = "none";
         }
       }
 
       // check checkboxes
-      // for (var role_index = 0; role_index < roles.length; role_index++) {
-      //   if (roles[role_index].checked) {
-      //     for (var champion_index = 0; champion_index < champions.length; champion_index++) {
-      //       if (!champions_data[champion_index]['tags'].includes(roles[role_index])) {
-      //         champions[champion_index].style.display = "none";
-      //       }
-      //     }
-      //   }
-      // }
+      for (var role_index = 0; role_index < roles.length; role_index++) {
+        if (roles[role_index].checked) {
+          for (var champion_index = 0; champion_index < champions.length; champion_index++) {
+            if (!(champions_data[champion_index]['tags'].includes(roles[role_index].id))) {
+              champions[champion_index].style.display = "none";
+            }
+          }
+        }
+      }
     }
 
     </script>
@@ -66,27 +67,27 @@
     <div class="roles_bar">
       <h3>Roles:</h3>
       <div class="roles_checkbox">
-        <input type="checkbox" class="checkbox" id="Assassin" onkeyup="search()">
+        <input type="checkbox" class="checkbox" id="Assassin" onchange="search()">
         <label for="Assassin">Assassin</label>
       </div>
       <div class="roles_checkbox">
-        <input type="checkbox" class="checkbox" id="Fighter" onkeyup="search()">
+        <input type="checkbox" class="checkbox" id="Fighter" onchange="search()">
         <label for="Fighter">Fighter</label>
       </div>
       <div class="roles_checkbox">
-        <input type="checkbox" class="checkbox" id="Mag" onkeyup="search()">
-        <label for="Mag">Mag</label>
+        <input type="checkbox" class="checkbox" id="Mage" onchange="search()">
+        <label for="Mag">Mage</label>
       </div>
       <div class="roles_checkbox">
-        <input type="checkbox" class="checkbox" id="Support" onkeyup="search()">
+        <input type="checkbox" class="checkbox" id="Support" onchange="search()">
         <label for="Support">Support</label>
       </div>
       <div class="roles_checkbox">
-        <input type="checkbox" class="checkbox" id="Tank" onkeyup="search()">
+        <input type="checkbox" class="checkbox" id="Tank" onchange="search()">
         <label for="Tank">Tank</label>
       </div>
       <div class="roles_checkbox">
-        <input type="checkbox" class="checkbox" id="Marksman" onkeyup="search()">
+        <input type="checkbox" class="checkbox" id="Marksman" onchange="search()">
         <label for="Marksman">Marksman</label>
       </div>
       <br>
