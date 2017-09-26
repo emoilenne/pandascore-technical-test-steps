@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="/css/styles.css">
     <script type="text/javascript">
     function search() {
-      // var data = <%- champions %>;
       var champions_data = <%- JSON.stringify(champions) %>;
       champions_data.sort(function (a, b) {
         a = a['name'].toLowerCase();
@@ -40,7 +39,6 @@
         if (!query || name.toLowerCase().indexOf(query) != -1) {
           champions[champion_index].style.display = "";
         } else {
-          console.log(1);
           champions[champion_index].style.display = "none";
         }
       }
@@ -56,7 +54,15 @@
         }
       }
     }
+    </script>
+    <script type="text/javascript">
+    function chart(i) {
+      var champion = <%- JSON.stringify(champions) %>[i];
+      modal.style.display = "block";
+      var modal_champion = document.getElementById("modal_champion");
+      modal_champion.innerHTML = "Statistics of " + champion['name'];
 
+    }
     </script>
   </head>
   <body>
@@ -76,7 +82,7 @@
       </div>
       <div class="roles_checkbox">
         <input type="checkbox" class="checkbox" id="Mage" onchange="search()">
-        <label for="Mag">Mage</label>
+        <label for="Mage">Mage</label>
       </div>
       <div class="roles_checkbox">
         <input type="checkbox" class="checkbox" id="Support" onchange="search()">
@@ -98,11 +104,33 @@
 
     <% for (var i = 0; i < champions.length; i++) { %>
       <% var name = champions[i]['name']; %>
-      <div class="champion">
+      <div onclick="chart(<%= i %>)" class="champion">
         <img src="img/<%= name %>Square.png">
         <center><%= name %></center>
       </div>
     <% } %>
 
+    <div id="stats" class="modal">
+      <div class="modal_content">
+        <span class="close">&times;</span>
+        <h1 style="text-align: center" id="modal_champion"></h1>
+        <h3 style="text-align: center">Roles</h3>
+      </div>
+
+    </div>
+
+
+    <script>
+    var modal = document.getElementById('stats');
+    var span = document.getElementsByClassName("close")[0];
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+    </script>
   </body>
 </html>
