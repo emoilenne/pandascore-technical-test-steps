@@ -4,63 +4,159 @@
     <title>Champions</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/styles.css">
+    <script src="/scripts/Chart.js"></script>
+    <script src="/scripts/search.js"></script>
     <script type="text/javascript">
-    function search() {
-      var champions_data = <%- JSON.stringify(champions) %>;
-      champions_data.sort(function (a, b) {
-        a = a['name'].toLowerCase();
-        b = b['name'].toLowerCase();
-        return (a < b) ? -1 : (a > b) ? 1 : 0;
-      })
-
-      searchBar = document.getElementById('searchBar');
-      var query = searchBar.value.trim().toLowerCase();
-
-      var champions = document.getElementsByClassName('champion');
-      var roles = document.getElementsByClassName('checkbox');
-
-      // should search if we have some query or any checkbox is on
-      var should_search = query
-      for (var role_index = 0; role_index < roles.length; role_index++) {
-        should_search = should_search || roles[role_index].checked;
+      function search_wrap() {
+        return search(<%- JSON.stringify(champions) %>);
       }
-
-      if (!should_search) {
-        for (var champion_index = 0; champion_index < champions.length; champion_index++) {
-          champions[champion_index].style.display = "";
-        }
-        return;
-      }
-
-      // check query
-      for (var champion_index = 0; champion_index < champions.length; champion_index++) {
-        var name = champions[champion_index].getElementsByTagName('center')[0].innerHTML;
-
-        if (!query || name.toLowerCase().indexOf(query) != -1) {
-          champions[champion_index].style.display = "";
-        } else {
-          champions[champion_index].style.display = "none";
-        }
-      }
-
-      // check checkboxes
-      for (var role_index = 0; role_index < roles.length; role_index++) {
-        if (roles[role_index].checked) {
-          for (var champion_index = 0; champion_index < champions.length; champion_index++) {
-            if (!(champions_data[champion_index]['tags'].includes(roles[role_index].id))) {
-              champions[champion_index].style.display = "none";
-            }
-          }
-        }
-      }
-    }
     </script>
+
     <script type="text/javascript">
+
+    function get_roles_data(matches, champion_id) {
+      var roles_data = { 'total' : 0};
+      for (var match_index = 0; match_index < matches.length; match_index++) {
+        var match = matches[match_index];
+        if (match['champion'] == champion_id) {
+          if (!(match['role'] in roles_data)) {
+            roles_data[match['role']] = 0;
+          }
+          roles_data[match['role']] += 1;
+          roles_data['total'] += 1;
+        }
+      }
+      if (roles_data['total'] == 0) {
+        return roles_data;
+      }
+      for (role in roles_data) {
+        if (role != 'total') {
+          roles_data[role] /= roles_data['total'] / 100;
+        }
+      }
+      delete roles_data['total'];
+
+      roles_data_raw = [];
+      for (role in roles_data) {
+        roles_data_raw.push({'role': capitalize(role), 'data': roles_data[role].toFixed(1)});
+      }
+
+      roles_data_raw.sort(function (a, b) {
+        a = a['data'];
+        b = b['data'];
+        return (a > b) ? -1 : (a < b) ? 1 : 0;
+      });
+      return roles_data_raw;
+    }
+    function capitalize(str) {
+      return str
+          .toLowerCase()
+          .split('_')
+          .map(function(word) {
+              return word[0].toUpperCase() + word.substr(1);
+          })
+          .join(' ');
+     }
+
+
+    var roles_chart = null;
+    var popularity_chart = null;
+
     function chart(i) {
       var champion = <%- JSON.stringify(champions) %>[i];
+      var matches = <%- JSON.stringify(matches) %>;
+      var popularity = <%- JSON.stringify(popularity_data) %>[i];
       modal.style.display = "block";
       var modal_champion = document.getElementById("modal_champion");
       modal_champion.innerHTML = "Statistics of " + champion['name'];
+
+
+
+
+      if (roles_chart) { roles_chart.destroy(); }
+      if (popularity_chart) { popularity_chart.destroy(); }
+      var roles = document.getElementById("roles_chart");
+      var roles_data_raw = get_roles_data(matches, champion['id']);
+      var roles_labels = [];
+      var roles_data = [];
+      for (role in roles_data_raw) {
+        roles_labels.push(roles_data_raw[role]['role']);
+        roles_data.push(roles_data_raw[role]['data']);
+      }
+
+      roles_chart = new Chart(roles, {
+          type: 'horizontalBar',
+          data: {
+              labels: roles_labels,
+              datasets: [{
+                  label: 'Roles',
+                  data: roles_data,
+                  backgroundColor: 'rgba(84, 137, 183, 1)'
+              }]
+          },
+          options: {
+            scaleShowVerticalLines: false,
+            tooltips: {
+              mode: 'single',
+              custom: function(tooltip) {
+                if (!tooltip) return;
+                // disable displaying the color box;
+                tooltip.displayColors = false;
+              },
+              callbacks: {
+                  label: function(tooltipItems, data) {
+                      return tooltipItems.xLabel + "%";
+                  }
+              }
+            },
+            legend: {
+              display: false
+            },
+            scales: {
+              xAxes: [{
+                ticks: {
+                  min: 0,
+                  max: 100,
+                  display: false
+                },
+                gridLines: {
+                    color: "rgba(0, 0, 0, 0)",
+                }
+              }],
+              yAxes: [{
+                barPercentage: 0.85,
+                gridLines: {
+                    color: "rgba(0, 0, 0, 0)",
+                }
+              }]
+            }
+          }
+      });
+
+
+
+      var popularity = document.getElementById("popularity_chart");
+      popularity_chart = new Chart(popularity, {
+          type: 'line',
+          data: [{
+
+          }],
+          options: {
+            legend: {
+              display: false
+            },
+            scales: {
+              xAxes: [{
+                ticks: {
+                  min: 0,
+                  max: 100,
+                  stepSize: 20
+                }
+              }]
+            }
+          }
+      });
+
 
     }
     </script>
@@ -68,32 +164,32 @@
   <body>
 
     <h1>Champion filters</h1>
-    <input type="text" class="search_bar" id="searchBar" onkeyup="search()" placeholder="Search Champions">
+    <input type="text" class="search_bar" id="searchBar" onkeyup="search_wrap()" placeholder="Search Champions">
 
     <div class="roles_bar">
       <h3>Roles:</h3>
       <div class="roles_checkbox">
-        <input type="checkbox" class="checkbox" id="Assassin" onchange="search()">
+        <input type="checkbox" class="checkbox" id="Assassin" onchange="search_wrap()">
         <label for="Assassin">Assassin</label>
       </div>
       <div class="roles_checkbox">
-        <input type="checkbox" class="checkbox" id="Fighter" onchange="search()">
+        <input type="checkbox" class="checkbox" id="Fighter" onchange="search_wrap()">
         <label for="Fighter">Fighter</label>
       </div>
       <div class="roles_checkbox">
-        <input type="checkbox" class="checkbox" id="Mage" onchange="search()">
+        <input type="checkbox" class="checkbox" id="Mage" onchange="search_wrap()">
         <label for="Mage">Mage</label>
       </div>
       <div class="roles_checkbox">
-        <input type="checkbox" class="checkbox" id="Support" onchange="search()">
+        <input type="checkbox" class="checkbox" id="Support" onchange="search_wrap()">
         <label for="Support">Support</label>
       </div>
       <div class="roles_checkbox">
-        <input type="checkbox" class="checkbox" id="Tank" onchange="search()">
+        <input type="checkbox" class="checkbox" id="Tank" onchange="search_wrap()">
         <label for="Tank">Tank</label>
       </div>
       <div class="roles_checkbox">
-        <input type="checkbox" class="checkbox" id="Marksman" onchange="search()">
+        <input type="checkbox" class="checkbox" id="Marksman" onchange="search_wrap()">
         <label for="Marksman">Marksman</label>
       </div>
       <br>
@@ -115,22 +211,24 @@
         <span class="close">&times;</span>
         <h1 style="text-align: center" id="modal_champion"></h1>
         <h3 style="text-align: center">Roles</h3>
+        <canvas id="roles_chart" width="400" height="150"></canvas>
+        <h3 style="text-align: center">Popularity History</h3>
+        <canvas id="popularity_chart" width="400" height="200"></canvas>
       </div>
-
     </div>
 
 
     <script>
-    var modal = document.getElementById('stats');
-    var span = document.getElementsByClassName("close")[0];
-    span.onclick = function() {
-        modal.style.display = "none";
-    }
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    }
+      var modal = document.getElementById('stats');
+      var span = document.getElementsByClassName("close")[0];
+      span.onclick = function() {
+          modal.style.display = "none";
+      }
+      window.onclick = function(event) {
+          if (event.target == modal) {
+              modal.style.display = "none";
+          }
+      }
     </script>
   </body>
 </html>
