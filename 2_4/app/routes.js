@@ -1,9 +1,17 @@
 function get_popularity_data(data) {
   var popularity_dates = {};
-
+  var min_date = null;
+  var max_date = null;
+  var all_champions = [];
   for (var match_index = 0; match_index < data['matches'].length; match_index++) {
     var match = data['matches'][match_index];
-    var date = Math.floor(match['timestamp'] / 864000).toString();
+    var date = Math.floor(match['timestamp'] / 864000);
+    if (!(match['champion'] in all_champions)) {
+      all_champions.push(match['champion']);
+    }
+    if (min_date == null || date < min_date) { min_date = date; }
+    if (max_date == null || date > max_date) { max_date = date; }
+    date = date.toString();
     if (!(date in popularity_dates)) {
       popularity_dates[date] = { 'total': 0};
     }
@@ -14,17 +22,31 @@ function get_popularity_data(data) {
     popularity_dates[date]['total']++;
   }
   for (var date in popularity_dates) {
-    for (var champion_index = 0; champion_index < date.length; champion_index++) {
-      date[champion_index] /= date['total'] / 100;
+    for (champion in popularity_dates[date]) {
+      if (champion != 'total') {
+        popularity_dates[date][champion] /= popularity_dates[date]['total'] / 100;
+        popularity_dates[date][champion] = popularity_dates[date][champion].toFixed(3);
+      }
     }
-    delete date['total'];
+    delete popularity_dates[date]['total'];
   }
   // console.log(popularity_dates);
   // restructure data so we can easily extract it for one champion
-  var popularity_champions = [];
-  for (var date in popularity_dates) {
-    for (var champion in popularity_dates[date]) {
-      popularity_champions.push({'champion': champion, 'date' : date});
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  var popularity_champions = {};
+  for (var champion in all_champions) {
+    popularity_champions[champion] = [];
+    for (var date = min_date; date <= max_date; date++ ) {
+      var formatted_date = new Date(date * 864000000);
+      var date_str = months[formatted_date.getMonth()] + ' ' + formatted_date.getFullYear();
+      console.log(date_str);
+      if (!(date in popularity_dates) || !(champion.toString() in popularity_dates[date.toString()])) {
+        popularity_champions[champion].push({'date': date_str, 'popularity': 0});
+      }
+      else {
+        popularity_champions[champion].push({'date': date_str, 'popularity': popularity_dates[date.toString()][champion.toString()]});
+      }
     }
   }
   return popularity_champions;
@@ -46,8 +68,10 @@ router.get('/', function(req, res) {
     b = b['name'].toLowerCase();
     return (a < b) ? -1 : (a > b) ? 1 : 0;
   });
+
+  var popularity = get_popularity_data(data);
   res.locals.champions = champions;
   res.locals.matches = data['matches'];
-  res.locals.popularity_data = get_popularity_data(data);
+  res.locals.popularity_data = popularity;
   res.render('pages/index');
 });

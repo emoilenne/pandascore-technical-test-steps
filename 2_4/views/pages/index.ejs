@@ -58,14 +58,13 @@
           .join(' ');
      }
 
-
     var roles_chart = null;
     var popularity_chart = null;
 
     function chart(i) {
       var champion = <%- JSON.stringify(champions) %>[i];
       var matches = <%- JSON.stringify(matches) %>;
-      var popularity = <%- JSON.stringify(popularity_data) %>[i];
+      var popularity_data_raw = <%- JSON.stringify(popularity_data) %>[champion['id'].toString()];
       modal.style.display = "block";
       var modal_champion = document.getElementById("modal_champion");
       modal_champion.innerHTML = "Statistics of " + champion['name'];
@@ -91,7 +90,7 @@
               datasets: [{
                   label: 'Roles',
                   data: roles_data,
-                  backgroundColor: 'rgba(84, 137, 183, 1)'
+                  backgroundColor: 'rgba(84, 137, 183, 0.8)'
               }]
           },
           options: {
@@ -136,22 +135,32 @@
 
 
       var popularity = document.getElementById("popularity_chart");
+
+      var popularity_labels = [];
+      var popularity_data = [];
+      console.log(popularity_data_raw);
+      for (entry in popularity_data_raw) {
+        popularity_labels.push(popularity_data_raw[entry]['date']);
+        popularity_data.push(parseFloat(popularity_data_raw[entry]['popularity']));
+      }
+      console.log(popularity_data);
+      console.log(popularity_labels);
+
       popularity_chart = new Chart(popularity, {
           type: 'line',
-          data: [{
-
-          }],
+          data: {
+            labels: popularity_labels,
+            datasets: [{
+              data: popularity_data,
+              backgroundColor: 'rgba(84, 137, 183, 0.8)'
+            }]
+          },
           options: {
             legend: {
               display: false
             },
             scales: {
               xAxes: [{
-                ticks: {
-                  min: 0,
-                  max: 100,
-                  stepSize: 20
-                }
               }]
             }
           }
@@ -211,9 +220,9 @@
         <span class="close">&times;</span>
         <h1 style="text-align: center" id="modal_champion"></h1>
         <h3 style="text-align: center">Roles</h3>
-        <canvas id="roles_chart" width="400" height="150"></canvas>
+        <canvas id="roles_chart"></canvas>
         <h3 style="text-align: center">Popularity History</h3>
-        <canvas id="popularity_chart" width="400" height="200"></canvas>
+        <canvas id="popularity_chart"></canvas>
       </div>
     </div>
 
