@@ -5,7 +5,9 @@ function get_popularity_data(data) {
   var all_champions = [];
   for (var match_index = 0; match_index < data['matches'].length; match_index++) {
     var match = data['matches'][match_index];
-    var date = Math.floor(match['timestamp'] / 864000);
+    // track every 10 days
+    var timeperiod = 10;
+    var date = Math.floor(match['timestamp'] / (timeperiod * 86400));
     if (!(match['champion'] in all_champions)) {
       all_champions.push(match['champion']);
     }
@@ -38,9 +40,8 @@ function get_popularity_data(data) {
   for (var champion in all_champions) {
     popularity_champions[champion] = [];
     for (var date = min_date; date <= max_date; date++ ) {
-      var formatted_date = new Date(date * 864000000);
+      var formatted_date = new Date(date * timeperiod * 86400000);
       var date_str = months[formatted_date.getMonth()] + ' ' + formatted_date.getFullYear();
-      console.log(date_str);
       if (!(date in popularity_dates) || !(champion.toString() in popularity_dates[date.toString()])) {
         popularity_champions[champion].push({'date': date_str, 'popularity': 0});
       }

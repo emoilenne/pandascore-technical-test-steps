@@ -138,13 +138,10 @@
 
       var popularity_labels = [];
       var popularity_data = [];
-      console.log(popularity_data_raw);
       for (entry in popularity_data_raw) {
         popularity_labels.push(popularity_data_raw[entry]['date']);
         popularity_data.push(parseFloat(popularity_data_raw[entry]['popularity']));
       }
-      console.log(popularity_data);
-      console.log(popularity_labels);
 
       popularity_chart = new Chart(popularity, {
           type: 'line',
@@ -162,8 +159,21 @@
             scales: {
               xAxes: [{
               }]
-            }
-          }
+            },
+            tooltips: {
+              mode: 'single',
+              custom: function(tooltip) {
+                if (!tooltip) return;
+                // disable displaying the color box;
+                tooltip.displayColors = false;
+              },
+              callbacks: {
+                  label: function(tooltipItems, data) {
+                      return tooltipItems.yLabel + "%";
+                  }
+              }
+            },
+          },
       });
 
 
