@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Display charts",
   "main": "server.js",
-  "scripts": {},
+  "scripts": {
+    "start": "python prepare_data.py && node server.js"
+  },
   "author": "Oleksandra Fedorova",
   "license": "ISC",
   "dependencies": {
